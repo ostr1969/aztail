@@ -3,3 +3,20 @@ update the script to do the following
 2. get the index, ids and paths for all documents by fetching doc._source, doc._id and doc.path.real
 3. for each path, analyze it using the ```analyze_file``` function
 4. update the original doc record in elasticsearch with the json data from (3)
+
+if you cant edit files bacause the container user different from local user:
+create a group in container and commit the container:
+docker exec -u root -it "containername" /bin/bash
+groupadd editors -g 1002
+usermode -aG editors vscode
+docker commit "containername" python:master
+
+now on local computer
+groupadd editors -g 1002
+sudo usermod -aG editors barako
+
+now logout totaly
+see if "id" shows you belong to editors
+if not newgrp editors
+chgrp -R editors /repos/aztails 
+

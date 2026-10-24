@@ -1,0 +1,12 @@
+{
+  "name": "aztail",
+  "image": "python:master",
+  "remoteUser": "1001:1002",
+  "mounts": [
+    "source=/data/PHD_litreture,target=/data,type=bind"
+  ],
+  "runArgs": [
+    "--group-add", "editors",
+    "--add-host=host.docker.internal:host-gateway"
+  ]
+}

@@ -1,14 +1,14 @@
 {
-    "elasticsearch_url": "http://localhost:9200",
+    "elasticsearch_url": "http://host.docker.internal:9200",
     "fscrawler": {
-        "exe": "C:\\Users\\User\\Documents\\repos\\TailsPlus\\fscrawler\\bin\\fscrawler.bat",
-        "config_dir": "C:\\Users\\User\\Documents\\repos\\TailsPlus\\fsjobs",
-        "defaults": "C:\\Users\\User\\Documents\\repos\\TailsPlus\\fsjobs\\_defaults.yaml"
+        "exe": "/opt/fscrawler/bin/fscrawler",
+        "config_dir": "/workspaces/aztail/fsjobs",
+        "defaults": "/workspaces/aztail/fsjobs/_defaults.yaml"
     },
     "dwg_indexer": {
-        "path": "..\\DwgTextract\\dwgtextract.exe",
-        "fonts_csv": "..\\DwgTextract\\Resources\\encode_list.csv",
-        "fonts_dir": "..\\DwgTextract\\Resources\\Fonts\\"
+        "path": "/workspaces/aztail/DwgTextract/dwgtextract.exe",
+        "fonts_csv": "/workspaces/aztail/DwgTextract/Resources/encode_list.csv",
+        "fonts_dir": "/workspaces/aztail/DwgTextract/Resources/Fonts/"
     },
     "semantic_model": {
         "transformer_model_name": "sentence-transformers/all-MiniLM-L6-v2",

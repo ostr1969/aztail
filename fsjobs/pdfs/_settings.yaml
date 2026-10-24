@@ -1,34 +1,12 @@
 elasticsearch:
-  bulk_size: 100
-  byte_size: 10mb
-  flush_interval: 5s
-  push_templates: false
-  semantic_search: false
-  ssl_verification: false
-  urls:
-  - http://es01:9200
+  index: pdfs
+  semantic_search: 'false'
+  urls: http://host.docker.internal:9200
 fs:
-  add_as_inner_object: false
-  add_filesize: true
-  attributes_support: false
-  continue_on_error: false
-  excludes:
-  - '*/~*'
-  filename_as_id: false
-  follow_symlinks: false
-  index_content: true
+  hash_algorithm: SHA-256
   index_folders: false
-  indexed_chars: '1000000'
-  json_support: false
-  lang_detect: false
+  indexed_chars: '100000.0'
   ocr:
     enabled: false
-    language: eng
-    pdf_strategy: auto
-  raw_metadata: false
-  remove_deleted: true
-  store_source: false
-  update_rate: 16m
-  url: /home/barako/Tails/Samples/PHD_litreture
-  xml_support: false
+  url: /data
 name: pdfs

@@ -2,6 +2,7 @@
 import argparse
 import json
 import subprocess
+from unittest import result
 import utils
 import os
 from subprocess import Popen, PIPE
@@ -25,7 +26,7 @@ def create_new_job(name: str):
     """create a new project for FSCrawler. this is the first step in running it."""
     print(f"Creating new job: {name}")
     #exe_path = CONFIG["fscrawler"]["exe"]
-    config_dir = utils.get_config("docker_env")["FSCRAWLER_CONFIG"]
+    config_dir = utils.get_config("fscrawler")["config_dir"]
     current_config_dir = os.path.join(config_dir,name)
     load_defaults_to_job(name)
     print("CREATED DIRECTORY and load default settings AT ", current_config_dir)
@@ -50,55 +51,84 @@ def run_fs_docker_job(name: str,target_dir: str):
                 "--network", "elastic", 
                 f"dadoonet/fscrawler:{FSCRAWLER_VERSION}", 
                 name, "--restart", "--loop", "1"])
+def run_local_fs_docker_job(name: str,target_dir: str):
+    env = os.environ.copy()
+    env["FSCRAWLER_ELASTICSEARCH_URLS"]= utils.get_config("elasticsearch_url")
+    DOCS_FOLDER= os.path.abspath(target_dir)
+    FSCRAWLER_CONFIG= os.path.abspath(utils.get_config("fscrawler")["config_dir"])
+    FSCRAWLER_EXE= os.path.abspath(utils.get_config("fscrawler")["exe"])
+    print("Running fscrawler  job", name, "on path", DOCS_FOLDER, "with config", FSCRAWLER_CONFIG)
+    cmd = [
+    FSCRAWLER_EXE,
+    name,
+    "--config_dir", FSCRAWLER_CONFIG,
+    "--loop", "1"
+    ]
+    print(cmd)
+    result=subprocess.run(cmd, env=env, stdout=PIPE, stderr=PIPE)
+    print("Exit code:", result.returncode)
+    print("STDOUT:")
+    print(result.stdout)
+
+    print("STDERR:")
+    print(result.stderr)
 
 def get_job_settings_path(name: str):
-    path = os.path.join(utils.get_config("docker_env")["FSCRAWLER_CONFIG"], name, "_settings.yaml")
+    path = os.path.join(utils.get_config("fscrawler")["config_dir"], name, "_settings.yaml")
     if not os.path.isfile(path):
         raise FscrawlerError("Specified project name doesn't exist, make sure to create it before editing and running: " + path)
     return path 
 
-def load_defaults_to_job_obselete(name: str):
+# def load_defaults_to_job_obselete(name: str):
+#     """Method to load the default settings to a fscrawler job. they are defined in the CONFIG json"""
+#     # loading everything from the defaults file
+#     with open(utils.get_config("fscrawler")["defaults"], "r") as f:
+#         d = yaml.safe_load(f)
+#     # changing elasticsearch adress to the one in CONFIG
+#     d["elasticsearch"] = {}
+#     d["elasticsearch"]["urls"] = utils.get_config("elasticsearch_url")
+#     d["elasticsearch"]["index"] = name
+    
+#     # setting name to proper name
+#     d["name"] = name
+#     # dumping settings to project dir
+#     jobDir=os.path.join(utils.get_config("fscrawler")["config_dir"], name)
+#     settingDir=os.path.join(utils.get_config("fscrawler")["config_dir"], name,"_settings.yaml")
+#     #os.mkdir(jobDir)
+#     with open(settingDir, "w") as f:
+#         yaml.dump(d, f)
+#     print("Loaded default settings to", settingDir)    
+def load_defaults_to_job(name: str):
     """Method to load the default settings to a fscrawler job. they are defined in the CONFIG json"""
     # loading everything from the defaults file
-    with open(utils.get_config("fscrawler")["defaults"], "r") as f:
+    with open(os.path.join(utils.get_config("fscrawler")["config_dir"], "_defaults.yaml"), "r") as f:
         d = yaml.safe_load(f)
     # changing elasticsearch adress to the one in CONFIG
-    d["elasticsearch"]["urls"] = utils.get_config("elasticsearch_url")
+    elastic_url=f"{utils.get_config("elasticsearch_url")}"
+    d["elasticsearch"] = {}
+    d["elasticsearch"]["urls"] = elastic_url
+    d["elasticsearch"]["index"] = name
+    d["elasticsearch"]["semantic_search"] = "false"
+    d["fs"]["indexed_chars"] = "100000.0"
     # setting name to proper name
     d["name"] = name
     # dumping settings to project dir
     jobDir=os.path.join(utils.get_config("fscrawler")["config_dir"], name)
-    settingDir=os.path.join(utils.get_config("fscrawler")["config_dir"], name,"_settings.yaml")
-    #os.mkdir(jobDir)
-    with open(settingDir, "w") as f:
-        yaml.dump(d, f)
-    print("Loaded default settings to", settingDir)    
-def load_defaults_to_job(name: str):
-    """Method to load the default settings to a fscrawler job. they are defined in the CONFIG json"""
-    # loading everything from the defaults file
-    with open(os.path.join(utils.get_config("docker_env")["FSCRAWLER_CONFIG"], "_defaults.yaml"), "r") as f:
-        d = yaml.safe_load(f)
-    # changing elasticsearch adress to the one in CONFIG
-    elastic_url=f"http://{utils.get_config("docker_env")["CLUSTER_NAME"]}:{utils.get_config("docker_env")["ES_PORT"]}"
-    d["elasticsearch"]["urls"] = [elastic_url]
-    # setting name to proper name
-    d["name"] = name
-    # dumping settings to project dir
-    jobDir=os.path.join(utils.get_config("docker_env")["FSCRAWLER_CONFIG"], name)
-    settingDir=os.path.join(utils.get_config("docker_env")["FSCRAWLER_CONFIG"], name,"_settings.yaml")
+    settingFile=os.path.join(utils.get_config("fscrawler")["config_dir"], name,"_settings.yaml")
     if not os.path.isdir(jobDir):
         os.mkdir(jobDir)
-    with open(settingDir, "w") as f:
+    with open(settingFile, "w") as f:
         yaml.dump(d, f)
-    create_job_templates(EsClient,name)
-    print("Loaded default settings to", settingDir ," and created templates in elasticsearch") 
-def create_job_templates(esclient, newname:str):
+    create_job_templates(name)
+    print("Loaded default settings to", settingFile ," and created templates in elasticsearch") 
+def create_job_templates( newname:str):
     """Method to create fscrawler templates in elasticsearch with a new name"""
     json_path = "fscrawler_templates.json"
     with open(json_path, "r", encoding="utf-8") as f:
         data = json.load(f)
     templates = data.get("component_templates", [])
     comps=[]
+    #print(f"teplates: {templates}")
     for tpl in templates:
         name = tpl["name"].replace("try1", newname)
         comps.append(name)
@@ -111,7 +141,8 @@ def create_job_templates(esclient, newname:str):
     body= index_template["index_template"]  
     body["composed_of"] = comps 
     body["index_patterns"] = [newname] 
-    response=esclient.indices.put_index_template(name=iname, body=body)
+    
+    response=EsClient.indices.put_index_template(name=iname, body=body)
 
     print(f" → Elasticsearch response: {response}")    
 def get_job_setting(name: str, key: str):
@@ -178,7 +209,7 @@ if __name__ == "__main__":
     if create_new_job(args.index_name):            
         edit_job_setting(args.index_name, "fs.url", args.path) 
         edit_job_setting(args.index_name, "fs.ocr.enabled", False)
-        run_fs_docker_job(args.index_name, args.path)
+        run_local_fs_docker_job(args.index_name, args.path)
     
 
 

@@ -1,0 +1,13 @@
+{
+  "completed_paths" : [ "/data" ],
+  "current_path" : "/data/Mombaur, Bock, Schl��der - 2001 - Human like Actuated Walking that Asymptotically stable without feedback.pdf",
+  "current_path_files_indexed_count" : 0,
+  "files_deleted" : 0,
+  "files_processed" : 254,
+  "last_error" : "Malformed input or input contains unmappable characters: /data/Mombaur, Bock, Schl��der - 2001 - Human like Actuated Walking that Asymptotically stable without feedback.pdf",
+  "pending_paths" : [ "/data/Mombaur, Bock, Schl��der - 2001 - Human like Actuated Walking that Asymptotically stable without feedback.pdf", "/data/Tomi�� et al. - 2018 - Toward optimal mapping of human dual-arm motion to humanoid motion for tasks involving contact with the environmen.pdf", "/data/Sp��gele, Kistner, Gollhofer - 1999 - A multi-phase optimal control technique for the simulation of a human vertical jump.pdf", "/data/Koch, Mombaur, Sou��res - 2012 - Optimization-based walking generation for humanoid robot.pdf", "/data/Sp��gele, Kistner, Gollhofer - 1999 - Modelling, simulation and optimisation of a human vertical jump.pdf", "/data/Jackson et al. - 2017 - Muscle���tendon mechanics explain unexpected effects of exoskeleton assistance on metabolic rate during walking.pdf", "/data/Koch, Mombaur, Sou��res - 2012 - Studying the effect of different optimization criteria on humanoid walking motions.pdf", "/data/Elliott, Marecki, Herr - 2014 - Design of a Clutch���Spring Knee Exoskeleton for Running.pdf", "/data/�������������� ���� ��������.dwg" ],
+  "retry_count" : 0,
+  "scan_id" : "b2ff5915-0dd3-4338-a7b6-4a573699c404",
+  "scan_start_time" : "2026-10-24T16:31:13.899414916Z",
+  "state" : "ERROR"
+}
